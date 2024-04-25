@@ -2,14 +2,17 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
-const FILE_PATH = path.resolve("video.mp4");
+// const FILE_PATH = path.resolve("video2.mp4");
 
 const server = http.createServer((req, res) => {
   if (req.method === "GET" && req.url === "/") {
     fs.createReadStream(path.resolve("index.html")).pipe(res);
     return;
   }
-  if (req.method === "GET" && req.url === "/video") {
+  if (req.method === "GET" && req.url.startsWith("/video")) {
+    const videoName = req.url.replace("/video/", "");
+
+    const FILE_PATH = path.resolve(videoName);
     const stat = fs.statSync(FILE_PATH);
     const fileSize = stat.size;
     const range = req.headers.range;
@@ -47,5 +50,6 @@ const IP_ADDRESS = "192.168.100.78";
 server.listen(3000, "127.0.0.1", function () {
   server.close(function () {
     server.listen(PORT, IP_ADDRESS);
+    console.log(`server running on ${PORT}, at IP: ${IP_ADDRESS} `);
   });
 });
